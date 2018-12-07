@@ -4,6 +4,7 @@ function RaceCar() {
 
 	this.startGame = function() {
 		this.drawRoad();
+		this.drawCar();
 	},
 
 	this.drawRoad = function() {
@@ -33,5 +34,21 @@ function RaceCar() {
 
 		this.ctx.stroke();
 		this.ctx.closePath();
+	},
+
+	this.drawCar = function() {
+		var img = new Image();
+		var that = this;
+
+		var width = 79;
+		var height = 160;
+
+		img.onload = function(){
+			var x = (that.canvas.width/2) - (width/2);
+			var y = (that.canvas.height - (height+10));
+
+			that.ctx.drawImage(img, x, y, width, height);
+		};
+		img.src = 'images/car.png';
 	}
 };
