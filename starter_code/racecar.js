@@ -2,7 +2,7 @@ function RaceCar() {
 	this.canvas = document.getElementById('game-board-canvas'),
 	this.ctx = this.canvas.getContext('2d'),
 	this.intervalId = null,
-	this.linesStart = -45;
+	this.linesStart = -45,
 	this.frames = 0,
 
 	this.startGame = function() {
@@ -16,6 +16,10 @@ function RaceCar() {
 		}, 20);
 	},
 
+	this.stopGame = function() {
+		clearInterval(this.intervalId);
+	},
+
 	this.update = function() {
 		this.frames += 1;
 
@@ -24,17 +28,21 @@ function RaceCar() {
 		raceCar.drawCar();
 
 		if(this.frames % 100 == 0) {
-			minWidth = 20;
-			maxWidth = 200;
-			width = Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
-			minGap = 50;
-			maxGap = 200;
-			gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+			var minWidth = 40;
+			var maxWidth = 200;
+			var width = Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+			var minGap = 100;
+			var maxGap = 250;
+			var gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
 
-			// obstacles.push(new Obstacle());
+			var x2 = width + gap;
+			var width2 = width + gap;
+			if(x2 + width2 < this.canvas.width) {
+				width2 = width2 + (this.canvas.width - width2);
+			}
 
 			obstacles.push(new Obstacle(0, width));
-  			obstacles.push(new Obstacle(0 + width + gap, width + gap));
+  			obstacles.push(new Obstacle(x2, width2));
 		}
 
 		for (i = 0; i < obstacles.length; i++) {
@@ -45,11 +53,19 @@ function RaceCar() {
 		obstacles = obstacles.filter(function(obstacle){
 			return obstacle.y < raceCar.canvas.height;
 		});
+
+		var crashed = obstacles.some(function(obstacle) {
+			return car.crashWith(obstacle);
+		});
+
+		if (crashed) {
+			raceCar.stopGame();
+		}
 	},
 
 	this.clear = function() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	}
+	},
 
 	this.drawRoad = function() {
 		this.ctx.fillStyle = "green";
@@ -123,6 +139,18 @@ function Car() {
 	this.x = (raceCar.canvas.width/2) - (this.width/2),
 	this.y = (raceCar.canvas.height) - (this.height+20),
 
+	this.left   = function() { return this.x                 },
+	this.right  = function() { return (this.x + this.width)  },
+	this.top    = function() { return this.y                 },
+	this.bottom = function() { return this.y + (this.height) },
+
+	this.crashWith = function(obstacle) {
+		return !((this.bottom() < obstacle.top())    ||
+			(this.top()    > obstacle.bottom()) ||
+			(this.right()  < obstacle.left())   ||
+			(this.left()   > obstacle.right()))
+	},
+
 	this.update = function() {
 		var that = this;
 
@@ -134,13 +162,21 @@ function Car() {
 };
 
 function Obstacle(x, width) {
+	this.x = x,
 	this.y = 0,
+	this.height = 10,
+	this.width = width,
+
+	this.left   = function() { return this.x                 },
+	this.right  = function() { return (this.x + this.width)  },
+	this.top    = function() { return this.y                 },
+	this.bottom = function() { return this.y + (this.height) },
 
 	this.update = function() {
-		this.y += 1;
+		this.y += 5;
 
 		raceCar.ctx.beginPath();
 		raceCar.ctx.fillStyle = "#FF0000";
-		raceCar.ctx.fillRect(x, this.y, width, 10);
+		raceCar.ctx.fillRect(this.x, this.y, this.width, this.height);
 	}
 };
