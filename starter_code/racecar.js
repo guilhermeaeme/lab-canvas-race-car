@@ -1,23 +1,22 @@
 function RaceCar() {
 	this.canvas = document.getElementById('game-board-canvas'),
 	this.ctx = this.canvas.getContext('2d'),
-	this.intervalId = null,
 	this.linesStart = -45,
 	this.frames = 0,
 
 	this.startGame = function() {
-		clearInterval(this.intervalId);
+		this.stopGame();
 
 		this.drawRoad();
 		this.drawCar();
 
-		this.intervalId = setInterval(function(){
+		raceCarInterval = setInterval(function(){
 			raceCar.update();
 		}, 20);
 	},
 
 	this.stopGame = function() {
-		clearInterval(this.intervalId);
+		clearInterval(raceCarInterval);
 	},
 
 	this.update = function() {
