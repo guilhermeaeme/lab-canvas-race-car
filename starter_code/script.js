@@ -1,5 +1,6 @@
 var raceCar;
 var car;
+var obstacles = [];
 
 window.onload = function() {
 	document.getElementById("start-button").onclick = function() {
@@ -13,7 +14,7 @@ window.onload = function() {
 		raceCar.startGame();
 	}
 
-	startGame();
+	// startGame();
 };
 
 document.onkeydown = function (e) {

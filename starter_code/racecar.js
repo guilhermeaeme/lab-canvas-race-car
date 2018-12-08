@@ -3,6 +3,7 @@ function RaceCar() {
 	this.ctx = this.canvas.getContext('2d'),
 	this.intervalId = null,
 	this.linesStart = -45;
+	this.frames = 0,
 
 	this.startGame = function() {
 		clearInterval(this.intervalId);
@@ -16,9 +17,34 @@ function RaceCar() {
 	},
 
 	this.update = function() {
+		this.frames += 1;
+
 		raceCar.clear();
 		raceCar.drawRoad();
 		raceCar.drawCar();
+
+		if(this.frames % 100 == 0) {
+			minWidth = 20;
+			maxWidth = 200;
+			width = Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+			minGap = 50;
+			maxGap = 200;
+			gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+
+			// obstacles.push(new Obstacle());
+
+			obstacles.push(new Obstacle(0, width));
+  			obstacles.push(new Obstacle(0 + width + gap, width + gap));
+		}
+
+		for (i = 0; i < obstacles.length; i++) {
+			obstacles[i].y += 1;
+			obstacles[i].update();
+		}
+
+		obstacles = obstacles.filter(function(obstacle){
+			return obstacle.y < raceCar.canvas.height;
+		});
 	},
 
 	this.clear = function() {
@@ -33,7 +59,6 @@ function RaceCar() {
 
 		this.ctx.lineWidth = 6;
 		this.ctx.strokeStyle = "#FFFFFF";
-
 
 		this.ctx.beginPath();
 
@@ -105,6 +130,17 @@ function Car() {
 		// this.img.onload = function(){
 			raceCar.ctx.drawImage(that.img, that.x, that.y, that.width, that.height);
 		// };
+	}
+};
 
+function Obstacle(x, width) {
+	this.y = 0,
+
+	this.update = function() {
+		this.y += 1;
+
+		raceCar.ctx.beginPath();
+		raceCar.ctx.fillStyle = "#FF0000";
+		raceCar.ctx.fillRect(x, this.y, width, 10);
 	}
 };
