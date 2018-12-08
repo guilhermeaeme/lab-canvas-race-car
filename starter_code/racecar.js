@@ -1,11 +1,27 @@
 function RaceCar() {
 	this.canvas = document.getElementById('game-board-canvas'),
 	this.ctx = this.canvas.getContext('2d'),
+	this.interval = null,
+	this.linesStart = -45;
 
 	this.startGame = function() {
 		this.drawRoad();
 		this.drawCar();
+
+		var that = this;
+
+		this.interval = setInterval(that.update, 20);
 	},
+
+	this.update = function() {
+		raceCar.clear();
+		raceCar.drawRoad();
+		raceCar.drawCar();
+	},
+
+	this.clear = function() {
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
 
 	this.drawRoad = function() {
 		this.ctx.fillStyle = "green";
@@ -25,30 +41,68 @@ function RaceCar() {
 		this.ctx.moveTo(this.canvas.width - 40, 0);
 		this.ctx.lineTo(this.canvas.width - 40, this.canvas.height);
 
-		var middle = this.canvas.width/2 - 3;
+		this.ctx.stroke();
+		this.ctx.closePath();
 
-		for(i=15; i<this.canvas.height; i+=60) {
+		this.drawLines();
+	},
+
+	this.drawLines = function() {
+		var middle = this.canvas.width/2 - 3;
+		this.ctx.beginPath();
+
+		for(i=this.linesStart; i<this.canvas.height; i+=60) {
 			this.ctx.moveTo(middle, i);
 			this.ctx.lineTo(middle, i+30);
 		}
 
 		this.ctx.stroke();
 		this.ctx.closePath();
+
+		this.linesStart += 5;
+
+		if(this.linesStart > 15) this.linesStart = -45;
 	},
 
 	this.drawCar = function() {
-		var img = new Image();
+		car.update();
+	},
+
+	this.checkCommand = function(keycode) {
+		if(keycode == 37) {
+			car.x -= 10;
+
+			if(car.x < 40) {
+				car.x = 40;
+			}
+		}
+
+		if(keycode == 39) {
+			car.x += 10;
+
+			if(car.x > ((this.canvas.width - 40) - car.width)) {
+				car.x = ((this.canvas.width - 40) - car.width);
+			}
+		}
+	}
+};
+
+function Car() {
+	this.img = new Image();
+
+	this.width = 80,
+	this.height = 160,
+
+	this.x = (raceCar.canvas.width/2) - (this.width/2),
+	this.y = (raceCar.canvas.height) - (this.height+20),
+
+	this.update = function() {
 		var that = this;
 
-		var width = 79;
-		var height = 160;
+		this.img.src = 'images/car.png';
+		// this.img.onload = function(){
+			raceCar.ctx.drawImage(that.img, that.x, that.y, that.width, that.height);
+		// };
 
-		img.onload = function(){
-			var x = (that.canvas.width/2) - (width/2);
-			var y = (that.canvas.height - (height+10));
-
-			that.ctx.drawImage(img, x, y, width, height);
-		};
-		img.src = 'images/car.png';
 	}
 };
