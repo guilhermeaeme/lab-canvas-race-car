@@ -3,6 +3,7 @@ function RaceCar() {
 	this.ctx = this.canvas.getContext('2d'),
 	this.linesStart = -45,
 	this.frames = 0,
+	this.score = 0;
 
 	this.startGame = function() {
 		this.stopGame();
@@ -49,6 +50,8 @@ function RaceCar() {
 			obstacles[i].update();
 		}
 
+		var obstaclesLength = obstacles.length;
+
 		obstacles = obstacles.filter(function(obstacle){
 			return obstacle.y < raceCar.canvas.height;
 		});
@@ -56,6 +59,12 @@ function RaceCar() {
 		var crashed = obstacles.some(function(obstacle) {
 			return car.crashWith(obstacle);
 		});
+
+		if (obstaclesLength > obstacles.length) {
+			this.score += 20;
+		}
+
+		this.drawScore();
 
 		if (crashed) {
 			raceCar.stopGame();
@@ -108,6 +117,12 @@ function RaceCar() {
 
 	this.drawCar = function() {
 		car.update();
+	},
+
+	this.drawScore = function() {
+		this.ctx.fillStyle = "#FFFF00";
+		this.ctx.font = '16px sans';
+		this.ctx.fillText("SCORE: " + this.score, 50, 20);
 	},
 
 	this.checkCommand = function(keycode) {
